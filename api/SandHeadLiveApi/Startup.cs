@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using SandHeadLiveApi.Hubs;
+using SandHeadLiveApi.Models;
 
 namespace SandHeadLiveApi
 {
@@ -20,10 +21,12 @@ namespace SandHeadLiveApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            var appSettings = Configuration.Get<AppSettings>();
+            services.AddSingleton(appSettings);
             services.AddCors(options =>
             {
                 options.AddDefaultPolicy(builder =>
-                    builder.WithOrigins(Configuration.GetValue<string>("AllowedCorsOrigin")).AllowAnyMethod().AllowAnyHeader().AllowCredentials());
+                    builder.WithOrigins(appSettings.AllowedCorsOrigin).AllowAnyMethod().AllowAnyHeader().AllowCredentials());
             });
             services.AddSignalR();
             services.AddControllers();

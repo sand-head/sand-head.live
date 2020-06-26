@@ -1,11 +1,30 @@
 import { createElement, Context, Copy } from '@bikeshaving/crank';
 import { SignalRClient, SIGNALR_KEY } from './SignalR';
 
+const equals = <T extends {}>(props: T, newProps: T) => {
+  for (const key in {...props, ...newProps}) {
+    if (props[key] !== newProps[key]) {
+      return false;
+    }
+  }
+  return true;
+};
+
 interface Message {
   username: string;
   identifier: string;
   message: string;
   timestamp: Date;
+}
+function *Message(this: Context<Message>, props: Message) {
+  yield <div>{props.username}#{props.identifier}: {props.message}</div>;
+  for (const newProps of this) {
+    if (equals(props, newProps)) {
+      yield <Copy />;
+    } else {
+      yield <div>{newProps.username}#{newProps.identifier}: {newProps.message}</div>;
+    }
+  }
 }
 export function* ChatLog(this: Context) {
   const client = this.get(SIGNALR_KEY) as SignalRClient;
@@ -26,7 +45,7 @@ export function* ChatLog(this: Context) {
       yield (
         <div id="messages">
           {messages.map(msg => (
-            <div crank-id={msg.identifier + '-' + msg.timestamp.getTime()}>{msg.username}#{msg.identifier}: {msg.message}</div>
+            <Message {...msg} crank-id={msg.identifier + '-' + msg.timestamp.getTime()} />
           ))}
           <ScrollToBottom />
         </div>

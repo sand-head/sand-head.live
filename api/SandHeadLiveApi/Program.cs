@@ -1,11 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using BedrockRtmp;
+using Microsoft.AspNetCore.Connections;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 
 namespace SandHeadLiveApi
 {
@@ -21,6 +17,15 @@ namespace SandHeadLiveApi
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
+                    webBuilder.UseKestrel(options =>
+                    {
+                        // RTMP over port 1935
+                        options.ListenLocalhost(1935, builder =>
+                            builder.UseConnectionLogging().UseConnectionHandler<RtmpConnectionHandler>());
+
+                        // HTTP over port 5000
+                        options.ListenLocalhost(5000);
+                    });
                 });
     }
 }

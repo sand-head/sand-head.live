@@ -32,5 +32,11 @@ namespace SandHeadLiveApi.Controllers
             // todo: Redirect here instead of Ok
             return Ok();
         }
+
+        [HttpGet]
+        public IActionResult Test()
+        {
+            return Ok("Hello World!");
+        }
     }
 }
